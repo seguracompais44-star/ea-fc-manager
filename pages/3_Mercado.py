@@ -46,7 +46,7 @@ if st.button("Añadir a Lista de Deseos"):
 if st.session_state.wishlist:
     st.subheader("📝 Lista de Objetivos")
     df_wish = pd.DataFrame(st.session_state.wishlist)
-    st.table(df_historial)
+    st.table(df_wish)  # <--- AQUÍ ESTABA EL ERROR, ahora dice df_wish
     
     total_inversion = df_wish["Coste"].sum()
     st.warning(f"Inversión total necesaria para estos fichajes: {total_inversion:,} €")
