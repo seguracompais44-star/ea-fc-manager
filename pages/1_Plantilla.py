@@ -3,28 +3,34 @@ import pandas as pd
 
 st.set_page_config(page_title="Plantilla - EA FC 26", layout="wide")
 
-st.title("📋 Gestión de Plantilla y Cuerpo Técnico")
+st.title("🏃 Gestión de Plantilla")
 
-# Función para cargar o crear base de datos
-def cargar_datos():
-    try:
-        return pd.read_csv('plantilla.csv')
-    except FileNotFoundError:
-        return pd.DataFrame(columns=['Nombre', 'Posición', 'Media', 'Contrato'])
+# Datos de ejemplo de tu club
+datos_jugadores = {
+    "Nombre": ["Mbappé", "Vinícius Jr.", "Bellingham", "Valverde"],
+    "Posición": ["DC", "EI", "MC", "MC"],
+    "Media": [91, 89, 88, 88],
+    "Contrato": [12, 25, 7, 45],
+    "Estado": ["Titular", "Titular", "Titular", "Suplente"]
+}
 
-df = cargar_datos()
+df = pd.DataFrame(datos_jugadores)
 
-# Formulario lateral para añadir miembros
-with st.sidebar.expander("Añadir Jugador/Staff"):
-    nombre = st.text_input("Nombre")
-    posicion = st.selectbox("Posición", ["POR", "DFC", "MC", "DC", "DT", "Prep. Físico"])
-    media = st.number_input("Media (OVR)", 40, 99, 75)
-    
-    if st.button("Registrar"):
-        nuevo = pd.DataFrame([[nombre, posicion, media, "Activo"]], columns=df.columns)
-        df = pd.concat([df, nuevo], ignore_index=True)
-        df.to_csv('plantilla.csv', index=False)
-        st.success("Guardado")
+# Filtros profesionales
+col1, col2 = st.columns(2)
+with col1:
+    pos_filter = st.multiselect("Filtrar por Posición", options=df["Posición"].unique())
+with col2:
+    estado_filter = st.multiselect("Filtrar por Estado", options=df["Estado"].unique())
 
-st.subheader("Lista de Miembros")
-st.dataframe(df, use_container_width=True)
+# Aplicar filtros
+df_filtrado = df.copy()
+if pos_filter:
+    df_filtrado = df_filtrado[df_filtrado["Posición"].isin(pos_filter)]
+if estado_filter:
+    df_filtrado = df_filtrado[df_filtrado["Estado"].isin(estado_filter)]
+
+# Mostrar tabla interactiva
+st.dataframe(df_filtrado, use_container_width=True)
+
+st.success(f"Mostrando {len(df_filtrado)} jugadores en la lista.")
